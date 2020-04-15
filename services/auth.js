@@ -1,12 +1,13 @@
+import jwt from "jsonwebtoken";
 import fetch from "isomorphic-unfetch";
 
 async function createUser(pwd) {
   const request = await fetch("https://paassword.now.sh/api/create", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ pwd })
+    body: JSON.stringify({ pwd }),
   });
 
   if (request.ok) {
@@ -22,9 +23,9 @@ async function validatePassword(passwordId, pwd) {
     {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ pwd })
+      body: JSON.stringify({ pwd }),
     }
   );
 
@@ -35,7 +36,40 @@ async function validatePassword(passwordId, pwd) {
   }
 }
 
+function sign(payload) {
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      payload,
+      process.env.SECRET || "secret",
+      {
+        expiresIn: "1d",
+      },
+      (err, token) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(token);
+      }
+    );
+  });
+}
+
+async function verify(token) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, process.env.SECRET || "secret", (err, payload) => {
+      if (err) {
+        return reject(err);
+      }
+
+      resolve(payload);
+    });
+  });
+}
+
 export default {
   validatePassword,
-  createUser
+  createUser,
+  sign,
+  verify,
 };

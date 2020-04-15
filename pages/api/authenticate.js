@@ -22,7 +22,7 @@ export default async (req, res) => {
     user = new User({
       name,
       email,
-      passwordId: await AuthService.createUser(password)
+      passwordId: await AuthService.createUser(password),
     });
 
     await user.save();
@@ -36,5 +36,9 @@ export default async (req, res) => {
     }
   }
 
-  res.end();
+  res.end(
+    await AuthService.sign({
+      id: user._id,
+    })
+  );
 };

@@ -6,6 +6,8 @@ import Input from "../components/Input";
 import Label from "../components/Label";
 import EmailService from "../services/email";
 import fetch from "isomorphic-unfetch";
+import Cookies from "js-cookie";
+import Router from "next/router";
 
 function reducer(state, action) {
     let error;
@@ -76,9 +78,12 @@ export default () => {
         });
 
         if (request.ok) {
-
+            const token = await request.text();
+            Cookies.set("_wsp", token, { secure: process.env.NODE_ENV === "production", sameSite: "lax" });
+            Router.push("/");
         } else {
             const error = await request.text();
+            console.log(error)
         }
     };
 
