@@ -17,7 +17,9 @@ export default async (req, res) => {
     return res.status(401).end();
   }
 
-  const user = await User.findOne({ _id: userID }, { name: -1 });
+  DatabaseService.connect();
+
+  const user = await User.findOne({ _id: userId }, { name: -1 });
 
   res.json(user.toObject());
 };
